@@ -60,12 +60,12 @@ func main() {
 	flag.Var(&headers, "headers", "headers to send")
 	flag.Parse()
 	if *version {
-		fmt.Printf("HealthChecker %s", VERSION)
+		fmt.Printf("HealthChecker %s\n", VERSION)
 		return
 	}
 	resp, err := request(method, url, &headers, timeout)
 	if err != nil {
-		fmt.Printf("Error: %s", err)
+		fmt.Printf("Error: %s\n", err)
 		os.Exit(10)
 	}
 	if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
@@ -77,7 +77,7 @@ func main() {
 		os.Exit(resp.StatusCode)
 	} else {
 		if *verbose == true {
-			fmt.Printf("Status : %s\nResponse Body : %s", resp.Status, read(resp.Body))
+			fmt.Printf("Status : %s\nResponse Body : %s\n", resp.Status, read(resp.Body))
 		}
 	}
 	return
