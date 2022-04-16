@@ -3,48 +3,81 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/go-resty/resty/v2"
+	"io"
+	"net/http"
 	"os"
+	"strings"
+	"time"
 )
 
 const VERSION = "0.0.1"
 
+type rawHeaders []string
+
+func (r *rawHeaders) String() string {
+	return "*Something Important*"
+}
+
+func (r *rawHeaders) Set(s string) error {
+	*r = append(*r, s)
+	return nil
+}
+
+func request(method *string, url *string, headers *rawHeaders, timeout *int) (*http.Response, error) {
+	if *url == "" {
+		fmt.Println("ERROR : URL required")
+		os.Exit(5)
+	}
+	request, _ := http.NewRequest(*method, *url, nil)
+	addHeaders(request, headers)
+	return (&http.Client{
+		Timeout: time.Second * time.Duration(*timeout),
+	}).Do(request)
+}
+
+func addHeaders(request *http.Request, headers *rawHeaders) {
+	for _, header := range *headers {
+		parsedHeader := strings.Split(header, ":")
+		request.Header.Set(parsedHeader[0], parsedHeader[1])
+	}
+}
+
+func read(closer io.ReadCloser) []byte {
+	d, _ := io.ReadAll(closer)
+	_ = closer.Close()
+	return d
+}
+
 func main() {
 	var (
-		url         = flag.String("url", "", "URL to fetch")
-		accessToken = flag.String("accessToken", "", "Optional access token")
-		version     = flag.Bool("version", false, "Print version and exit")
-		verbose     = flag.Bool("verbose", false, "Logging Verbosely")
+		headers rawHeaders
+		url     = flag.String("url", "", "URL to fetch")
+		version = flag.Bool("version", false, "Print version and exit")
+		verbose = flag.Bool("verbose", false, "Logging Verbosely")
+		timeout = flag.Int("timeout", 15, "timeout")
+		method  = flag.String("method", "GET", "HTTP Method")
 	)
+	flag.Var(&headers, "headers", "headers to send")
 	flag.Parse()
 	if *version {
 		fmt.Printf("HealthChecker %s", VERSION)
 		return
 	}
-	if *url == "" {
-		fmt.Println("ERROR : URL required")
-		os.Exit(5)
-	}
-	request := resty.New().R().
-		SetHeader("user-agent", fmt.Sprintf("HealthChecker %s", VERSION))
-	if *accessToken != "" {
-		request.SetHeader("Authorization", fmt.Sprintf("Bearer %s", *accessToken))
-	}
-	resp, err := request.Get(*url)
+	resp, err := request(method, url, &headers, timeout)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		os.Exit(10)
 	}
-	if !resp.IsSuccess() {
+	if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
 		if *verbose == true {
-			fmt.Printf("Status : %s\nResponse Body : %s", resp.Status(), resp.Body())
+			fmt.Printf("Status : %s\nResponse Body : %s\n", resp.Status, read(resp.Body))
 		} else {
-			fmt.Printf("Error: %s", resp.Status())
+			fmt.Printf("Error: %s\n", resp.Status)
 		}
-		os.Exit(resp.StatusCode())
+		os.Exit(resp.StatusCode)
 	} else {
 		if *verbose == true {
-			fmt.Printf("Status : %s\nResponse Body : %s", resp.Status(), resp.Body())
+			fmt.Printf("Status : %s\nResponse Body : %s", resp.Status, read(resp.Body))
 		}
 	}
 	return
