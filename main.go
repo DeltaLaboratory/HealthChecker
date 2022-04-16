@@ -12,8 +12,9 @@ const VERSION = "0.0.1"
 func main() {
 	var (
 		url         = flag.String("url", "", "URL to fetch")
-		accessToken = flag.String("access token", "", "Optional access token")
+		accessToken = flag.String("accessToken", "", "Optional access token")
 		version     = flag.Bool("version", false, "Print version and exit")
+		verbose     = flag.Bool("verbose", false, "Logging Verbosely")
 	)
 	flag.Parse()
 	if *version {
@@ -35,7 +36,16 @@ func main() {
 		os.Exit(10)
 	}
 	if !resp.IsSuccess() {
-		fmt.Printf("Error: %s", resp.Status())
+		if *verbose == true {
+			fmt.Printf("Status : %s\nResponse Body : %s", resp.Status(), resp.Body())
+		} else {
+			fmt.Printf("Error: %s", resp.Status())
+		}
+		os.Exit(resp.StatusCode())
+	} else {
+		if *verbose == true {
+			fmt.Printf("Status : %s\nResponse Body : %s", resp.Status(), resp.Body())
+		}
 	}
 	return
 }
