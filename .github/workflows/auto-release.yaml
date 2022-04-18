@@ -40,9 +40,6 @@ jobs:
       - name: Build Application [windows/ARM]
         run: env GOOS=windows GOARCH=arm go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm_windows.exe
 
-      - name: Build Application [windows/ARM64]
-        run: env GOOS=windows GOARCH=ARM64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm64_windows.exe
-
       - name: Build Application [darwin/i386]
         run: env GOOS=darwin GOARCH=386 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-i386_darwin
 
@@ -67,7 +64,6 @@ jobs:
             hc-${{ env.Tag }}-i386_windows.exe
             hc-${{ env.Tag }}-amd64_windows.exe
             hc-${{ env.Tag }}-arm_windows.exe
-            hc-${{ env.Tag }}-arm64_windows.exe
             hc-${{ env.Tag }}-i386_darwin
             hc-${{ env.Tag }}-amd64_darwin
             hc-${{ env.Tag }}-arm_darwin
@@ -85,7 +81,6 @@ jobs:
             hc-${{ env.Tag }}-i386_windows.exe
             hc-${{ env.Tag }}-amd64_windows.exe
             hc-${{ env.Tag }}-arm_windows.exe
-            hc-${{ env.Tag }}-arm64_windows.exe
             hc-${{ env.Tag }}-i386_darwin
             hc-${{ env.Tag }}-amd64_darwin
             hc-${{ env.Tag }}-arm_darwin
