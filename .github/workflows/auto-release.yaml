@@ -43,9 +43,6 @@ jobs:
       - name: Build Application [darwin/AMD64]
         run: env GOOS=darwin GOARCH=amd64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-amd64_darwin
 
-      - name: Build Application [darwin/ARM]
-        run: env GOOS=darwin GOARCH=arm go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm_darwin
-
       - name: Build Application [darwin/ARM64]
         run: env GOOS=darwin GOARCH=arm64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm64_darwin
 
@@ -62,13 +59,13 @@ jobs:
             hc-${{ env.Tag }}-amd64_windows.exe
             hc-${{ env.Tag }}-arm_windows.exe
             hc-${{ env.Tag }}-amd64_darwin
-            hc-${{ env.Tag }}-arm_darwin
             hc-${{ env.Tag }}-arm64_darwin
           args: "--brute -v"
 
       - name: Release Application
         uses: softprops/action-gh-release@v1
         with:
+          name: Release v${{ env.Tag }}
           files: |
             hc-${{ env.Tag }}-i386_linux
             hc-${{ env.Tag }}-amd64_linux
@@ -78,5 +75,4 @@ jobs:
             hc-${{ env.Tag }}-amd64_windows.exe
             hc-${{ env.Tag }}-arm_windows.exe
             hc-${{ env.Tag }}-amd64_darwin
-            hc-${{ env.Tag }}-arm_darwin
             hc-${{ env.Tag }}-arm64_darwin
