@@ -1,0 +1,92 @@
+name: Automatic Release
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # https://github.community/t/how-to-get-just-the-tag-name/16241/7
+      - name: Get the tag name
+        run: echo "Tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      - name: Set Up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.18"
+          check-latest: true
+
+      - name: Build Application [linux/i386]
+        run: env GOOS=linux GOARCH=386 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-i386_linux
+
+      - name: Build Application [linux/AMD64]
+        run: env GOOS=linux GOARCH=amd64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-amd64_linux
+
+      - name: Build Application [linux/ARM]
+        run: env GOOS=linux GOARCH=arm go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm_linux
+
+      - name: Build Application [linux/ARM64]
+        run: env GOOS=linux GOARCH=arm64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm64_linux
+
+      - name: Build Application [windows/i386]
+        run: env GOOS=windows GOARCH=386 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-i386_windows.exe
+
+      - name: Build Application [windows/AMD64]
+        run: env GOOS=windows GOARCH=amd64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-amd64_windows.exe
+
+      - name: Build Application [windows/ARM]
+        run: env GOOS=windows GOARCH=arm go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm_windows.exe
+
+      - name: Build Application [windows/ARM64]
+        run: env GOOS=windows GOARCH=ARM64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm64_windows.exe
+
+      - name: Build Application [darwin/i386]
+        run: env GOOS=darwin GOARCH=386 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-i386_darwin
+
+      - name: Build Application [darwin/AMD64]
+        run: env GOOS=darwin GOARCH=amd64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-amd64_darwin
+
+      - name: Build Application [darwin/ARM]
+        run: env GOOS=darwin GOARCH=arm go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm_darwin
+
+      - name: Build Application [darwin/ARM64]
+        run: env GOOS=darwin GOARCH=arm64 go build -v -ldflags "-s -w -X main.VERSION=${{ env.Tag }}" -o hc-${{ env.Tag }}-arm64_darwin
+
+      - name: Packing Application
+        uses: crazy-max/ghaction-upx@v1
+        with:
+          version: latest
+          files: |
+            hc-${{ env.Tag }}-i386_linux
+            hc-${{ env.Tag }}-amd64_linux
+            hc-${{ env.Tag }}-arm_linux
+            hc-${{ env.Tag }}-arm64_linux
+            hc-${{ env.Tag }}-i386_windows.exe
+            hc-${{ env.Tag }}-amd64_windows.exe
+            hc-${{ env.Tag }}-arm_windows.exe
+            hc-${{ env.Tag }}-arm64_windows.exe
+            hc-${{ env.Tag }}-i386_darwin
+            hc-${{ env.Tag }}-amd64_darwin
+            hc-${{ env.Tag }}-arm_darwin
+            hc-${{ env.Tag }}-arm64_darwin
+          args: "--brute -v"
+
+      - name: Release Application
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            hc-${{ env.Tag }}-i386_linux
+            hc-${{ env.Tag }}-amd64_linux
+            hc-${{ env.Tag }}-arm_linux
+            hc-${{ env.Tag }}-arm64_linux
+            hc-${{ env.Tag }}-i386_windows.exe
+            hc-${{ env.Tag }}-amd64_windows.exe
+            hc-${{ env.Tag }}-arm_windows.exe
+            hc-${{ env.Tag }}-arm64_windows.exe
+            hc-${{ env.Tag }}-i386_darwin
+            hc-${{ env.Tag }}-amd64_darwin
+            hc-${{ env.Tag }}-arm_darwin
+            hc-${{ env.Tag }}-arm64_darwin

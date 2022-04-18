@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const VERSION = "0.0.1"
+const VERSION = "Unreleased"
 
 type rawHeaders []string
 
@@ -25,7 +25,7 @@ func (r *rawHeaders) Set(s string) error {
 
 func request(method *string, url *string, headers *rawHeaders, timeout *int) (*http.Response, error) {
 	if *url == "" {
-		fmt.Println("ERROR : URL required")
+		fmt.Println("Error : URL required")
 		os.Exit(5)
 	}
 	request, _ := http.NewRequest(*method, *url, nil)
@@ -53,8 +53,8 @@ func main() {
 		headers rawHeaders
 		url     = flag.String("url", "", "URL to fetch")
 		version = flag.Bool("version", false, "Print version and exit")
-		verbose = flag.Bool("verbose", false, "Logging Verbosely")
-		timeout = flag.Int("timeout", 15, "timeout")
+		verbose = flag.Bool("verbose", false, "Logging verbosely")
+		timeout = flag.Int("timeout", 15, "Timeout")
 		method  = flag.String("method", "GET", "HTTP Method")
 	)
 	flag.Var(&headers, "headers", "headers to send")
@@ -65,14 +65,14 @@ func main() {
 	}
 	resp, err := request(method, url, &headers, timeout)
 	if err != nil {
-		fmt.Printf("Error: %s\n", err)
+		fmt.Printf("Error : %s\n", err)
 		os.Exit(10)
 	}
 	if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
 		if *verbose == true {
 			fmt.Printf("Status : %s\nResponse Body : %s\n", resp.Status, read(resp.Body))
 		} else {
-			fmt.Printf("Error: %s\n", resp.Status)
+			fmt.Printf("Error : %s\n", resp.Status)
 		}
 		os.Exit(resp.StatusCode)
 	} else {
