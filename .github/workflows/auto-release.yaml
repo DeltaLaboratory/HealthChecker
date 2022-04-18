@@ -57,7 +57,6 @@ jobs:
             hc-${{ env.Tag }}-arm64_linux
             hc-${{ env.Tag }}-i386_windows.exe
             hc-${{ env.Tag }}-amd64_windows.exe
-            hc-${{ env.Tag }}-arm_windows.exe
             hc-${{ env.Tag }}-amd64_darwin
             hc-${{ env.Tag }}-arm64_darwin
           args: "--brute -v"
