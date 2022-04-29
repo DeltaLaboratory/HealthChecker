@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const VERSION = "Unreleased"
+var VERSION = "Unreleased"
 
 type rawHeaders []string
 

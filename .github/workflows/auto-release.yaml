@@ -14,7 +14,7 @@ jobs:
       - name: Configuring Basic Variables
         run: |
           echo "Tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-          echo "LDFLAGS=-s -w -X main.VERSION=${{ env.Tag }}" >> $GITHUB_ENV
+          echo "LDFLAGS=-s -w -X 'main.VERSION=${{ env.Tag }}'" >> $GITHUB_ENV
           echo "UPX_ARGS=--brute -v" >> $GITHUB_ENV
           echo "APPLICATION_NAME=hc" >> $GITHUB_ENV
       - name: Set Up Go
@@ -24,7 +24,7 @@ jobs:
           check-latest: true
 
       - name: Build Application [linux/i386]
-        run: env GOOS=linux GOARCH=386 go build -v -ldflags "" -o ${{ env.APPLICATION_NAME }}-${{ env.Tag }}-i386_linux
+        run: env GOOS=linux GOARCH=386 go build -v -ldflags "${{ env.LDFLAGS }}" -o ${{ env.APPLICATION_NAME }}-${{ env.Tag }}-i386_linux
 
       - name: Build Application [linux/AMD64]
         run: env GOOS=linux GOARCH=amd64 go build -v -ldflags "${{ env.LDFLAGS }}" -o ${{ env.APPLICATION_NAME }}-${{ env.Tag }}-amd64_linux
